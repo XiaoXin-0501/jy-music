@@ -1,0 +1,98 @@
+server:
+  port: 8080
+spring:
+  profiles:
+    active: dev
+    web:
+      resources:
+        static-locations: file:D:/jy_music/jy_upload/
+      mvc:
+        static-path-pattern: jy_upload/**
+      servlet:
+        multipart:
+          max-file-size: 1000MB
+          max-request-size: 1000MB
+      datasource:
+        # 数据源类型
+        type: com.alibaba.druid.pool.DruidDataSource
+        # 驱动类名
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/jy_music?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+        username: name
+        password: password
+        # Druid连接池配置
+        druid:
+          initial-size: 5
+          min-idle: 5
+          max-active: 20
+      data:
+        # redis 配置
+        redis:
+          # 地址
+          host: host
+          # 端口，默认为6379
+          port: 6379
+          # 数据库索引
+          database: 0
+          # 密码
+          password:
+          # 连接超时时间
+          timeout: 10s
+    #      lettuce:
+    #        pool:
+    #          # 连接池中的最小空闲连接
+    #          min-idle: 0
+    #          # 连接池中的最大空闲连接
+    #          max-idle: 8
+    #          # 连接池的最大数据库连接数
+    #          max-active: 8
+    #          # #连接池最大阻塞等待时间（使用负值表示没有限制）
+    #          max-wait: -1ms
+
+
+
+    mybatis:
+      mapper-locations: classpath:mapper/*.xml
+      type-aliases-package: com.jy.entity
+      configuration:
+        map-underscore-to-camel-case: true
+        auto-mapping-behavior: FULL
+
+    security:
+      user:
+        password:
+          # 密码最大错误次数
+          maxRetryCount: 5
+          # 密码锁定时间（默认10分钟）
+          lockTime: 15
+      token:
+        #令牌自定义标识
+        header: Authorization
+        #token前缀
+        prefix: "Bearer "
+        # 令牌密钥
+        secret: JY&&XiaoXin
+        #令牌有效期（默认300分钟）
+        expireTime: 300
+        #续签时间间隔
+        refreshExpireTime: 20
+      captcha:
+        width: 135
+        height: 40
+        count: 4
+        thickness: 1
+        expiration: 10
+
+    file:
+      server: http://localhost:8080
+      base-dir: D:/jy_music
+      temp-hash: jy_upload/temp/hash
+      user:
+        path:
+          avatar: jy_upload/user/avatar
+        max-upload: 3
+      song:
+        path:
+          song-url: jy_upload/song/songUrl
+          lyrics: jy_upload/song/lyrics
+          cover-img: jy_upload/song/coverImg

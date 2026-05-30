@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jy.mapper.SongMapper">
+
+    <resultMap id="SongWithCategoryMap" type="com.jy.entity.SongEntity">
+        <id column="id" property="id"/>
+        <collection property="categories" ofType="java.lang.Long">
+            <result column="category_id"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="SongListWithSongIdsMap" type="com.jy.vo.responseVo.SongListInfo">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="cover_img" property="coverImg"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+
+        <!-- 只保留歌曲 ID -->
+        <collection property="songs" ofType="java.lang.Long">
+            <id column="song_id"/>
+        </collection>
+    </resultMap>
+
+    <insert id="insertSong">
+        INSERT INTO jy_song (id,
+                             account,
+                             singer,
+                             create_time,
+                             cover_img,
+                             name,
+                             lyrics,
+                             song_url,
+                             lyricist,
+                             composer,
+                             duration,
+                             play_count,
+                             collect_count,
+                             sort,
+                             status)
+        VALUES (#{id},
+                #{account},
+                #{singer},
+                #{createTime},
+                #{coverImg},
+                #{name},
+                #{lyrics},
+                #{songUrl},
+                #{lyricist},
+                #{composer},
+                #{duration},
+                #{playCount},
+                #{collectCount},
+                #{sort},
+                #{status})
+    </insert>
+    <insert id="insertSongCategoryRelation">
+        INSERT INTO song_category (song_id, category_id)
+        VALUES
+        <foreach collection="categories" item="categoryId" separator=",">
+            (#{songId}, #{categoryId})
+        </foreach>
+    </insert>
+    <insert id="insertSongListRelation">
+        INSERT INTO song_list_song (list_id, song_id)
+        VALUES (#{listId}, #{songId})
+    </insert>
+    <insert id="insertSongToList">
+        INSERT INTO song_list_song (list_id, song_id)
+        VALUES (#{listId}, #{songId})
+    </insert>
+    <insert id="insertSongList">
+        INSERT INTO jy_song_list (id, name, create_time)
+        VALUES (#{id}, #{name}, #{createTime})
+    </insert>
+    <insert id="insertSongUserRelation">
+        INSERT INTO song_list_user (list_id, user_id)
+        VALUES (#{listId}, #{userId})
+    </insert>
+    <update id="updateSong">
+        UPDATE jy_song
+        <set>
+            <if test="songEntity.singer != null and !songEntity.singer.isEmpty()">singer = #{songEntity.singer},</if>
+            <if test="songEntity.coverImg != null and !songEntity.coverImg.isEmpty()">cover_img =
+                #{songEntity.coverImg},
+            </if>
+            <if test="songEntity.name != null and !songEntity.name.isEmpty()">`name` = #{songEntity.name},</if>
+            <if test="songEntity.lyrics != null and !songEntity.lyrics.isEmpty()">lyrics = #{songEntity.lyrics},</if>
+            <if test="songEntity.songUrl != null and !songEntity.songUrl.isEmpty()">song_url = #{songEntity.songUrl},
+            </if>
+            <if test="songEntity.lyricist != null and !songEntity.lyricist.isEmpty()">lyricist =
+                #{songEntity.lyricist},
+            </if>
+            <if test="songEntity.composer != null and !songEntity.composer.isEmpty()">composer =
+                #{songEntity.composer},
+            </if>
+            <if test="songEntity.duration != null and !songEntity.duration.isEmpty()">duration =
+                #{songEntity.duration},
+            </if>
+        </set>
+        WHERE id = #{songId}
+    </update>
+    <update id="updateSongList">
+        UPDATE jy_song_list
+        <set>
+            <if test="name != null and name != ''">
+                `name` = #{name},
+            </if>
+            <if test="coverImg != null and coverImg != ''">
+                cover_img = #{coverImg},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    <update id="updateSongState">
+        UPDATE jy_song
+        <trim prefix="SET" suffixOverrides=",">
+
+            play_count =
+            CASE id
+            <foreach collection="songStateBos" item="item">
+                WHEN #{item.songId} THEN #{item.playCount}
+            </foreach>
+            END,
+            collect_count =
+            CASE id
+            <foreach collection="songStateBos" item="item">
+                WHEN #{item.songId} THEN #{item.collectCount}
+            </foreach>
+            END
+        </trim>
+        WHERE id IN
+        <foreach collection="songStateBos"
+                 item="item"
+                 open="("
+                 separator=","
+                 close=")">
+            #{item.songId}
+        </foreach>
+    </update>
+    <delete id="deleteCategoriesById">
+        DELETE
+        FROM song_category
+        WHERE song_id = #{songId}
+    </delete>
+    <delete id="deleteSongById">
+        DELETE
+        FROM jy_song
+        WHERE id = #{songId}
+    </delete>
+    <delete id="deleteSong">
+        DELETE
+        FROM song_list_song
+        WHERE song_id = #{songId}
+    </delete>
+    <delete id="deleteSongFromList">
+        DELETE
+        FROM song_list_song
+        WHERE song_id = #{songId}
+          AND list_id = #{listId}
+    </delete>
+    <delete id="deleteSongListById">
+        DELETE
+        FROM jy_song_list
+        WHERE id = #{listId}
+    </delete>
+    <delete id="deleteSongListUserRelation">
+        DELETE
+        FROM song_list_user
+        WHERE list_id = #{listId}
+          AND user_id = #{userId}
+    </delete>
+    <select id="getSongById" resultMap="SongWithCategoryMap">
+        SELECT id,
+               account,
+               singer,
+               create_time,
+               cover_img,
+               name,
+               lyrics,
+               lyricist,
+               composer,
+               duration,
+               play_count,
+               collect_count,
+               status,
+               sort,
+               song_url,
+               category_id
+        FROM jy_song
+                 LEFT JOIN song_category ON jy_song.id = song_category.song_id
+        WHERE id = #{songId}
+    </select>
+    <select id="getSongListByUserId" resultMap="SongListWithSongIdsMap">
+        SELECT sl.id,
+               sl.name,
+               sl.cover_img,
+               sl.create_time,
+               sl.update_time,
+               s.id AS song_id
+        FROM song_list_user slu
+                 LEFT JOIN jy_song_list sl ON slu.list_id = sl.id
+                 LEFT JOIN song_list_song sls ON sl.id = sls.list_id
+                 LEFT JOIN jy_song s ON sls.song_id = s.id
+        WHERE slu.user_id = #{userId}
+    </select>
+    <select id="getSongListByListId" resultMap="SongListWithSongIdsMap">
+        SELECT sl.id,
+               sl.name,
+               sl.cover_img,
+               sl.create_time,
+               sl.update_time,
+               s.id AS song_id
+        FROM song_list_user slu
+                 LEFT JOIN jy_song_list sl ON slu.list_id = sl.id
+                 LEFT JOIN song_list_song sls ON sl.id = sls.list_id
+                 LEFT JOIN jy_song s ON sls.song_id = s.id
+        WHERE sl.id = #{listId}
+    </select>
+    <select id="getSongIdsByUserId" resultType="java.lang.Long">
+        SELECT sls.song_id
+        FROM song_list_user slu
+                 JOIN jy_song_list sl ON slu.list_id = sl.id
+                 JOIN song_list_song sls ON sl.id = sls.list_id
+        WHERE slu.user_id = #{userId}
+    </select>
+
+</mapper>

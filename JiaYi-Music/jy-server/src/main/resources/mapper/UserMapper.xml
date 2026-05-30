@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jy.mapper.UserMapper">
+    <resultMap id="UserWithRolesResultMap" type="com.jy.entity.UserEntity">
+        <!-- 主实体主键：提升MyBatis映射效率 -->
+        <id property="id" column="user_id"/>
+        <!-- 映射List<RoleEntity> -->
+        <collection property="roles" ofType="com.jy.entity.RoleEntity">
+            <id property="id" column="role_id"/>
+            <result property="roleName" column="role_name"/>
+        </collection>
+    </resultMap>
+
+    <update id="updateLoginInfo">
+        update jy_user set login_ip = #{loginIp}, login_time = #{loginTime} where id = #{id}
+    </update>
+    <update id="updateAvatar">
+        update jy_user set avatar = #{avatar}, update_time = sysdate() where id = #{id}
+    </update>
+
+    <update id="updateUserInfo">
+        update jy_user
+        set
+            nick_name = #{userInfoBody.nickName},
+            sex = #{userInfoBody.sex},
+            email = #{userInfoBody.email},
+            birthday = #{userInfoBody.birthday},
+            update_time = sysdate()
+        where id = #{id}
+    </update>
+
+    <select id="getUserByUserAccount" resultMap="UserWithRolesResultMap">
+        SELECT
+        u.id AS user_id,
+        u.nick_name,
+        u.account,
+        u.password,
+        u.email,
+        u.avatar,
+        u.sex,
+        u.birthday,
+        u.status,
+        u.login_ip,
+        u.login_time,
+        u.create_time,
+        u.update_time,
+        r.id AS role_id,
+        r.role_name
+        FROM
+        jy_user u
+        LEFT JOIN
+        user_role ur ON u.id = ur.user_id
+        LEFT JOIN
+        jy_role r ON ur.role_id = r.id
+        WHERE
+        u.account = #{userAccount}
+    </select>
+</mapper>

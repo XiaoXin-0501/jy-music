@@ -1,0 +1,106 @@
+# ================ 编辑器/IDE相关 ================
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Eclipse
+.settings/
+.project
+.classpath
+bin/
+
+# ================ 构建输出目录 ================
+# Maven
+target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Gradle
+build/
+.gradle/
+
+# Vue/Vite
+dist/
+dist-ssr/
+*.local
+
+# ================ 依赖目录 ================
+# Node.js
+node_modules/
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# ================ 日志和临时文件 ================
+*.log
+*.log.*
+logs/
+temp/
+tmp/
+
+# ================ 配置文件（可能包含敏感信息） ================
+# Spring Boot 仅忽略本地开发私有配置
+JiaYi-Music/jy-server/src/main/resources/application-dev.yml
+bootstrap-local.yml
+bootstrap-local.properties
+application.properties
+
+# 数据库配置
+*.db
+data/
+
+# ================ 操作系统相关文件 ================
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ================ 其他 ================
+# Maven本地仓库缓存
+.mvn/wrapper/maven-wrapper.jar
+
+# 证书文件
+*.pem
+*.key
+*.crt
+*.p12
+
+# 上传文件目录
+uploads/
+
+# 测试覆盖报告
+coverage/
+.nyc_output/
